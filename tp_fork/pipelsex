@@ -1,0 +1,32 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+
+main()
+{
+	int p[2];
+	if(pipe(p))
+	{
+		perror("pipe");
+		exit();
+	}
+	switch(fork())
+	{
+		case -1 :
+			perror("Pb fork");
+			exit();
+		case 0 :
+			close(STDOUT FILENO);
+			(void)dup(p[1]);
+			close(p[1]);
+			execlp("ls","ls","-l",NULL);
+		default :
+			close(STDIN FILENO);
+			(void)dup(p[0]);
+			close(p[0]);
+			close(p[1]);
+			execlp("ls","ls","-l",NULL);
+	}
+
+}
+
